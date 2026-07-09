@@ -19,11 +19,12 @@ import { MostFieldedTable } from '../components/stats/MostFieldedTable'
 import { TopScorersTable } from '../components/stats/TopScorersTable'
 import { LegendsByTeamTable } from '../components/stats/LegendsByTeamTable'
 import { RoundSelectionPanel } from '../components/stats/RoundSelectionPanel'
+import { RoundNewsPanel } from '../components/news/RoundNewsPanel'
 import { Button } from '../components/ui/Button'
 import { Spinner } from '../components/ui/Spinner'
 import type { Team } from '../types/database'
 
-type Tab = 'standings' | 'matches' | 'teams' | 'stats'
+type Tab = 'standings' | 'matches' | 'teams' | 'stats' | 'news'
 
 export function LeagueTableCompetitionPage({ competition }: { competition: Competition }) {
   const [tab, setTab] = useState<Tab>('standings')
@@ -53,6 +54,9 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
   const existingTeamIds = new Set(competitionTeamRows.map((r) => r.team_id))
   const rounds = [...new Set(matches.map((m) => m.round).filter((r): r is number => r != null))].sort((a, b) => a - b)
+  const playedRounds = [
+    ...new Set(matches.filter((m) => m.status === 'played').map((m) => m.round).filter((r): r is number => r != null)),
+  ].sort((a, b) => a - b)
 
   async function handleRecordMatch(input: Parameters<typeof recordMatch>[0]) {
     await recordMatch(input)
@@ -83,6 +87,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
             ['matches', 'Jogos'],
             ['teams', 'Times'],
             ['stats', 'Estatísticas'],
+            ['news', 'Notícias'],
           ] as [Tab, string][]
         ).map(([key, label]) => (
           <button
@@ -173,6 +178,10 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
             <LegendsByTeamTable rows={legendsByTeam} />
           </div>
         </div>
+      )}
+
+      {tab === 'news' && (
+        <RoundNewsPanel competitionId={competition.id} rounds={playedRounds} allTeams={allTeams} />
       )}
 
       <MatchFormModal

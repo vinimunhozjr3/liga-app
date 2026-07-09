@@ -73,6 +73,23 @@ export interface Final {
   created_at: string
 }
 
+export interface Rivalry {
+  id: string
+  team_a_id: string
+  team_b_id: string | null
+  created_at: string
+}
+
+export interface RoundNews {
+  id: string
+  competition_id: string
+  round: number
+  title: string
+  body: string
+  created_by: string | null
+  created_at: string
+}
+
 export interface ChampionStats {
   competition_id: string
   team_id: string
