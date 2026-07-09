@@ -7,7 +7,7 @@ import { useStandings } from '../hooks/useStandings'
 import { useTeams } from '../hooks/useTeams'
 import { usePlayerStats } from '../hooks/usePlayerStats'
 import { StandingsTable } from '../components/standings/StandingsTable'
-import { MatchList } from '../components/matches/MatchList'
+import { MatchesTabContent } from '../components/matches/MatchesTabContent'
 import { MatchFormModal } from '../components/matches/MatchFormModal'
 import { ImportFromScreenshotModal } from '../components/matches/ImportFromScreenshotModal'
 import { ImportCalendarModal } from '../components/matches/ImportCalendarModal'
@@ -130,7 +130,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
               <Spinner />
             </div>
           ) : (
-            <MatchList matches={matches} onDelete={handleDeleteMatch} />
+            <MatchesTabContent matches={matches} teams={teams} onDelete={handleDeleteMatch} />
           )}
         </div>
       )}
