@@ -5,7 +5,8 @@ import { supabase } from '../lib/supabaseClient'
 interface AuthContextValue {
   session: Session | null
   loading: boolean
-  signInWithEmail: (email: string) => Promise<void>
+  signUpWithPassword: (email: string, password: string) => Promise<void>
+  signInWithPassword: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -30,13 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  async function signInWithEmail(email: string) {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    })
+  async function signUpWithPassword(email: string, password: string) {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+  }
+
+  async function signInWithPassword(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
   }
 
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, loading, signInWithEmail, signOut }}>
+    <AuthContext.Provider value={{ session, loading, signUpWithPassword, signInWithPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   )
