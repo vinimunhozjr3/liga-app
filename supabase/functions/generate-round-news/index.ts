@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       return `- ${m.home_team.name} ${m.home_score} x ${m.away_score} ${m.away_team.name}${penaltyNote}${rivalry ? ' [CLASSICO/RIVALIDADE]' : ''}${scorers ? ` | Gols: ${scorers}` : ''}`
     })
 
-    const prompt = `Voce e um redator esportivo de um jornal informal e caricato, no estilo dos comentaristas de TV brasileiros mais exagerados: informal, sarcastico, ironico, cheio de cliche de futebol ("categoria nao se discute", "jogo de resultado", "time entrou concentrado", etc), zoeira pesada mas sempre com humor, nunca ofensa de verdade — e uma brincadeira entre amigos.
+    const prompt = `Voce e um redator esportivo de um jornal informal e caricato, no estilo dos comentaristas de TV brasileiros mais exagerados: informal, sarcastico, ironico, cheio de cliche de futebol ("categoria nao se discute", "jogo de resultado", "time entrou concentrado", etc), afiado e provocador — pode ser bem debochado e implicante com os jogadores, sempre no espirito de brincadeira pesada entre amigos, nunca ódio ou ofensa de verdade.
 
 Escreva uma materia sobre a rodada ${round} do campeonato "${competition.name}"${competition.season ? ` (temporada ${competition.season})` : ''}, um torneio caseiro entre amigos jogando um jogo de futebol no video game.
 
@@ -132,10 +132,11 @@ Resultados da rodada:
 ${matchSummaries.join('\n')}
 
 Regras:
-- Comente TODOS os jogos da rodada, cada um em pelo menos um paragrafo.
-- Jogos marcados como [CLASSICO/RIVALIDADE] merecem ainda mais deboche, provocacao e drama — trate como um classico historico cheio de rivalidade.
+- Texto CURTO e direto: no maximo 3 a 4 paragrafos curtos no total, sem enrolacao.
+- Comente todos os jogos da rodada, mas em frases curtas e afiadas, nao precisa de um paragrafo inteiro por jogo.
+- Jogos marcados como [CLASSICO/RIVALIDADE] merecem o dobro do deboche e provocacao — trate como um classico historico cheio de rivalidade.
 - Se houver artilheiros listados, cite pelo nome e faca graca com a atuacao.
-- Titulo deve ser chamativo e engracado.
+- Titulo deve ser curto, chamativo e engracado.
 - Nao invente placares ou nomes que nao foram informados.
 - Use a tool write_news para responder.`
 
