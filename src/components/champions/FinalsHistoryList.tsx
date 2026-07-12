@@ -6,7 +6,15 @@ interface FinalRow extends Final {
   runner_up_team: Team
 }
 
-export function FinalsHistoryList({ finals, onDelete }: { finals: FinalRow[]; onDelete: (id: string) => void }) {
+export function FinalsHistoryList({
+  finals,
+  onDelete,
+  isAdmin = true,
+}: {
+  finals: FinalRow[]
+  onDelete: (id: string) => void
+  isAdmin?: boolean
+}) {
   if (finals.length === 0) {
     return <EmptyState title="Nenhuma final registrada ainda" />
   }
@@ -26,9 +34,11 @@ export function FinalsHistoryList({ finals, onDelete }: { finals: FinalRow[]; on
             </p>
             {final.edition && <p className="text-xs text-slate-500">{final.edition}</p>}
           </div>
-          <button onClick={() => onDelete(final.id)} className="text-xs text-slate-400 hover:text-red-600" aria-label="Remover final">
-            ✕
-          </button>
+          {isAdmin && (
+            <button onClick={() => onDelete(final.id)} className="text-xs text-slate-400 hover:text-red-600" aria-label="Remover final">
+              ✕
+            </button>
+          )}
         </li>
       ))}
     </ul>

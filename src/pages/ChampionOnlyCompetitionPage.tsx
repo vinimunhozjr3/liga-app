@@ -6,6 +6,7 @@ import { useTeamTitles } from '../hooks/useTeamTitles'
 import { useTeams } from '../hooks/useTeams'
 import { useFinals } from '../hooks/useFinals'
 import { useChampionStats } from '../hooks/useChampionStats'
+import { useAuth } from '../hooks/useAuth'
 import { ChampionsRanking } from '../components/champions/ChampionsRanking'
 import { RecordFinalModal } from '../components/champions/RecordFinalModal'
 import { FinalsHistoryList } from '../components/champions/FinalsHistoryList'
@@ -15,6 +16,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { EmptyState } from '../components/ui/EmptyState'
 
 export function ChampionOnlyCompetitionPage({ competition }: { competition: Competition }) {
+  const { isAdmin } = useAuth()
   const { rows: competitionTeamRows, teams, loading, addTeam } = useCompetitionTeams(competition.id)
   const { loading: titlesLoading, setTitleCount, countFor } = useTeamTitles(competition.id)
   const { teams: allTeams, createTeam } = useTeams()
@@ -44,22 +46,26 @@ export function ChampionOnlyCompetitionPage({ competition }: { competition: Comp
           <h1 className="text-xl font-semibold text-slate-900">{competition.name}</h1>
           {competition.season && <p className="text-xs text-slate-500">{competition.season}</p>}
         </div>
-        <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
-          Configurações
-        </Link>
+        {isAdmin && (
+          <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
+            Configurações
+          </Link>
+        )}
       </div>
 
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Ranking de campeões</h2>
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setFinalModalOpen(true)}>
-              Registrar final
-            </Button>
-            <Button variant="secondary" onClick={() => setAddModalOpen(true)}>
-              + Time
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={() => setFinalModalOpen(true)}>
+                Registrar final
+              </Button>
+              <Button variant="secondary" onClick={() => setAddModalOpen(true)}>
+                + Time
+              </Button>
+            </div>
+          )}
         </div>
 
         {busy ? (
@@ -70,7 +76,7 @@ export function ChampionOnlyCompetitionPage({ competition }: { competition: Comp
           <EmptyState
             title="Nenhum time nessa competição"
             description="Adicione os times que disputam este campeonato para começar a contar os títulos."
-            action={<Button onClick={() => setAddModalOpen(true)}>Adicionar time</Button>}
+            action={isAdmin ? <Button onClick={() => setAddModalOpen(true)}>Adicionar time</Button> : undefined}
           />
         ) : (
           <ChampionsRanking
@@ -84,6 +90,7 @@ export function ChampionOnlyCompetitionPage({ competition }: { competition: Comp
               }
             })}
             onChangeBaseCount={(teamId, newCount) => setTitleCount(teamId, newCount)}
+            isAdmin={isAdmin}
           />
         )}
       </div>
@@ -91,30 +98,34 @@ export function ChampionOnlyCompetitionPage({ competition }: { competition: Comp
       {teams.length > 0 && (
         <div>
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Histórico de finais</h2>
-          <FinalsHistoryList finals={finals} onDelete={handleDeleteFinal} />
+          <FinalsHistoryList finals={finals} onDelete={handleDeleteFinal} isAdmin={isAdmin} />
         </div>
       )}
 
-      <AddTeamToCompetitionModal
-        open={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        allTeams={allTeams}
-        existingTeamIds={existingTeamIds}
-        onAddExisting={async (teamId) => {
-          await addTeam(teamId)
-        }}
-        onCreateAndAdd={async (input) => {
-          const team = await createTeam(input)
-          await addTeam(team.id)
-        }}
-      />
+      {isAdmin && (
+        <>
+          <AddTeamToCompetitionModal
+            open={addModalOpen}
+            onClose={() => setAddModalOpen(false)}
+            allTeams={allTeams}
+            existingTeamIds={existingTeamIds}
+            onAddExisting={async (teamId) => {
+              await addTeam(teamId)
+            }}
+            onCreateAndAdd={async (input) => {
+              const team = await createTeam(input)
+              await addTeam(team.id)
+            }}
+          />
 
-      <RecordFinalModal
-        open={finalModalOpen}
-        onClose={() => setFinalModalOpen(false)}
-        teams={teams}
-        onSubmit={handleRecordFinal}
-      />
+          <RecordFinalModal
+            open={finalModalOpen}
+            onClose={() => setFinalModalOpen(false)}
+            teams={teams}
+            onSubmit={handleRecordFinal}
+          />
+        </>
+      )}
     </div>
   )
 }

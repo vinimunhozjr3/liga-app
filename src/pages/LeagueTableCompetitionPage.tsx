@@ -6,6 +6,7 @@ import { useMatches } from '../hooks/useMatches'
 import { useStandings } from '../hooks/useStandings'
 import { useTeams } from '../hooks/useTeams'
 import { usePlayerStats } from '../hooks/usePlayerStats'
+import { useAuth } from '../hooks/useAuth'
 import { StandingsTable } from '../components/standings/StandingsTable'
 import { MatchesTabContent } from '../components/matches/MatchesTabContent'
 import { MatchFormModal } from '../components/matches/MatchFormModal'
@@ -27,6 +28,7 @@ import type { Team } from '../types/database'
 type Tab = 'standings' | 'matches' | 'teams' | 'stats' | 'news'
 
 export function LeagueTableCompetitionPage({ competition }: { competition: Competition }) {
+  const { isAdmin } = useAuth()
   const [tab, setTab] = useState<Tab>('standings')
 
   const { standings, loading: standingsLoading, refresh: refreshStandings } = useStandings(competition.id)
@@ -86,9 +88,11 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
           <h1 className="text-xl font-semibold text-slate-900">{competition.name}</h1>
           {competition.season && <p className="text-xs text-slate-500">{competition.season}</p>}
         </div>
-        <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
-          Configurações
-        </Link>
+        {isAdmin && (
+          <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
+            Configurações
+          </Link>
+        )}
       </div>
 
       <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
@@ -124,18 +128,20 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
       {tab === 'matches' && (
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button variant="secondary" onClick={() => setCalendarModalOpen(true)}>
-              Importar calendário
-            </Button>
-            <Button variant="secondary" onClick={() => setResultsBlockModalOpen(true)}>
-              Colar resultados da rodada
-            </Button>
-            <Button variant="secondary" onClick={() => setImportModalOpen(true)}>
-              Importar de print
-            </Button>
-            <Button onClick={() => setMatchModalOpen(true)}>+ Lançar placar</Button>
-          </div>
+          {isAdmin && (
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button variant="secondary" onClick={() => setCalendarModalOpen(true)}>
+                Importar calendário
+              </Button>
+              <Button variant="secondary" onClick={() => setResultsBlockModalOpen(true)}>
+                Colar resultados da rodada
+              </Button>
+              <Button variant="secondary" onClick={() => setImportModalOpen(true)}>
+                Importar de print
+              </Button>
+              <Button onClick={() => setMatchModalOpen(true)}>+ Lançar placar</Button>
+            </div>
+          )}
           {matchesLoading ? (
             <div className="flex flex-1 items-center justify-center">
               <Spinner />
@@ -147,6 +153,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
               onDelete={handleDeleteMatch}
               onDeleteMany={handleDeleteManyMatches}
               onDeleteAll={handleDeleteAllMatches}
+              isAdmin={isAdmin}
             />
           )}
         </div>
@@ -154,11 +161,13 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
       {tab === 'teams' && (
         <div className="flex flex-col gap-3">
-          <div className="flex justify-end">
-            <Button variant="secondary" onClick={() => setAddTeamModalOpen(true)}>
-              + Adicionar time
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex justify-end">
+              <Button variant="secondary" onClick={() => setAddTeamModalOpen(true)}>
+                + Adicionar time
+              </Button>
+            </div>
+          )}
           {teamsLoading ? (
             <div className="flex flex-1 items-center justify-center">
               <Spinner />
@@ -171,6 +180,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
                 const row = competitionTeamRows.find((r) => r.team_id === team.id)
                 if (row) removeTeam(row.id)
               }}
+              isAdmin={isAdmin}
             />
           )}
         </div>
@@ -198,65 +208,69 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
       )}
 
       {tab === 'news' && (
-        <RoundNewsPanel competitionId={competition.id} rounds={playedRounds} allTeams={allTeams} />
+        <RoundNewsPanel competitionId={competition.id} rounds={playedRounds} allTeams={allTeams} isAdmin={isAdmin} />
       )}
 
-      <MatchFormModal
-        open={matchModalOpen}
-        onClose={() => setMatchModalOpen(false)}
-        teams={teams}
-        onSubmit={handleRecordMatch}
-      />
+      {isAdmin && (
+        <>
+          <MatchFormModal
+            open={matchModalOpen}
+            onClose={() => setMatchModalOpen(false)}
+            teams={teams}
+            onSubmit={handleRecordMatch}
+          />
 
-      <ImportFromScreenshotModal
-        open={importModalOpen}
-        onClose={() => setImportModalOpen(false)}
-        matches={matches}
-        onSaved={refreshStandings}
-      />
+          <ImportFromScreenshotModal
+            open={importModalOpen}
+            onClose={() => setImportModalOpen(false)}
+            matches={matches}
+            onSaved={refreshStandings}
+          />
 
-      <ImportCalendarModal
-        open={calendarModalOpen}
-        onClose={() => setCalendarModalOpen(false)}
-        teams={teams}
-        onSchedule={async (entries) => {
-          await scheduleMatches(entries)
-          await refreshMatches()
-        }}
-      />
+          <ImportCalendarModal
+            open={calendarModalOpen}
+            onClose={() => setCalendarModalOpen(false)}
+            teams={teams}
+            onSchedule={async (entries) => {
+              await scheduleMatches(entries)
+              await refreshMatches()
+            }}
+          />
 
-      <ImportResultsBlockModal
-        open={resultsBlockModalOpen}
-        onClose={() => setResultsBlockModalOpen(false)}
-        teams={teams}
-        onApply={async (results) => {
-          await applyResults(results)
-          await refreshStandings()
-        }}
-      />
+          <ImportResultsBlockModal
+            open={resultsBlockModalOpen}
+            onClose={() => setResultsBlockModalOpen(false)}
+            teams={teams}
+            onApply={async (results) => {
+              await applyResults(results)
+              await refreshStandings()
+            }}
+          />
 
-      <AddTeamToCompetitionModal
-        open={addTeamModalOpen}
-        onClose={() => setAddTeamModalOpen(false)}
-        allTeams={allTeams}
-        existingTeamIds={existingTeamIds}
-        onAddExisting={async (teamId) => {
-          await addTeam(teamId)
-        }}
-        onCreateAndAdd={async (input) => {
-          const team = await createTeam(input)
-          await addTeam(team.id)
-        }}
-      />
+          <AddTeamToCompetitionModal
+            open={addTeamModalOpen}
+            onClose={() => setAddTeamModalOpen(false)}
+            allTeams={allTeams}
+            existingTeamIds={existingTeamIds}
+            onAddExisting={async (teamId) => {
+              await addTeam(teamId)
+            }}
+            onCreateAndAdd={async (input) => {
+              const team = await createTeam(input)
+              await addTeam(team.id)
+            }}
+          />
 
-      <TeamFormModal
-        open={!!editingTeam}
-        onClose={() => setEditingTeam(null)}
-        initialTeam={editingTeam}
-        onSubmit={async (input) => {
-          if (editingTeam) await updateTeam(editingTeam.id, input)
-        }}
-      />
+          <TeamFormModal
+            open={!!editingTeam}
+            onClose={() => setEditingTeam(null)}
+            initialTeam={editingTeam}
+            onSubmit={async (input) => {
+              if (editingTeam) await updateTeam(editingTeam.id, input)
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }

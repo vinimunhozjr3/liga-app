@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 interface AuthContextValue {
   session: Session | null
   loading: boolean
+  isAdmin: boolean
   signUpWithPassword: (email: string, password: string) => Promise<void>
   signInWithPassword: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -31,6 +33,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    const userId = session?.user.id
+    if (!userId) {
+      setIsAdmin(false)
+      return
+    }
+    supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        setIsAdmin(data?.is_admin ?? false)
+      })
+  }, [session?.user.id])
+
   async function signUpWithPassword(email: string, password: string) {
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
@@ -46,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, loading, signUpWithPassword, signInWithPassword, signOut }}>
+    <AuthContext.Provider value={{ session, loading, isAdmin, signUpWithPassword, signInWithPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   )

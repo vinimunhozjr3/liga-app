@@ -6,10 +6,12 @@ export function TeamList({
   teams,
   onEdit,
   onRemove,
+  isAdmin = true,
 }: {
   teams: Team[]
   onEdit: (team: Team) => void
   onRemove: (team: Team) => void
+  isAdmin?: boolean
 }) {
   if (teams.length === 0) {
     return <EmptyState title="Nenhum time nessa competição" description="Adicione os times participantes." />
@@ -18,7 +20,12 @@ export function TeamList({
   return (
     <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200">
       {teams.map((team) => (
-        <TeamListItem key={team.id} team={team} onEdit={() => onEdit(team)} onRemove={() => onRemove(team)} />
+        <TeamListItem
+          key={team.id}
+          team={team}
+          onEdit={isAdmin ? () => onEdit(team) : undefined}
+          onRemove={isAdmin ? () => onRemove(team) : undefined}
+        />
       ))}
     </ul>
   )

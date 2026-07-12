@@ -14,7 +14,7 @@ export function MatchList({
   onToggleSelect,
 }: {
   matches: MatchWithTeams[]
-  onDelete: (matchId: string) => void
+  onDelete?: (matchId: string) => void
   selectedIds?: Set<string>
   onToggleSelect?: (matchId: string) => void
 }) {
@@ -30,7 +30,7 @@ export function MatchList({
           match={match}
           homeTeam={match.home_team}
           awayTeam={match.away_team}
-          onDelete={() => onDelete(match.id)}
+          onDelete={onDelete ? () => onDelete(match.id) : undefined}
           selected={selectedIds?.has(match.id)}
           onToggleSelect={onToggleSelect ? () => onToggleSelect(match.id) : undefined}
         />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCompetitions } from '../hooks/useCompetitions'
+import { useAuth } from '../hooks/useAuth'
 import { DEFAULT_ZONES } from '../lib/constants'
 import { CompetitionCard } from '../components/competitions/CompetitionCard'
 import { CreateCompetitionModal } from '../components/competitions/CreateCompetitionModal'
@@ -9,13 +10,14 @@ import { EmptyState } from '../components/ui/EmptyState'
 
 export function HomePage() {
   const { competitions, loading, createCompetition } = useCompetitions()
+  const { isAdmin } = useAuth()
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-900">Campeonatos</h1>
-        <Button onClick={() => setModalOpen(true)}>+ Novo</Button>
+        {isAdmin && <Button onClick={() => setModalOpen(true)}>+ Novo</Button>}
       </div>
 
       {loading ? (
@@ -26,7 +28,7 @@ export function HomePage() {
         <EmptyState
           title="Nenhum campeonato ainda"
           description="Crie o primeiro campeonato do grupo, tipo Brasileirão ou Copa do Brasil."
-          action={<Button onClick={() => setModalOpen(true)}>Criar campeonato</Button>}
+          action={isAdmin ? <Button onClick={() => setModalOpen(true)}>Criar campeonato</Button> : undefined}
         />
       ) : (
         <div className="flex flex-col gap-2">
@@ -36,18 +38,20 @@ export function HomePage() {
         </div>
       )}
 
-      <CreateCompetitionModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onCreate={async ({ name, type, season }) => {
-          await createCompetition({
-            name,
-            type,
-            season,
-            zones_config: type === 'league_table' ? DEFAULT_ZONES : [],
-          })
-        }}
-      />
+      {isAdmin && (
+        <CreateCompetitionModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onCreate={async ({ name, type, season }) => {
+            await createCompetition({
+              name,
+              type,
+              season,
+              zones_config: type === 'league_table' ? DEFAULT_ZONES : [],
+            })
+          }}
+        />
+      )}
     </div>
   )
 }

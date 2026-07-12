@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useCompetition } from '../hooks/useCompetitions'
+import { useAuth } from '../hooks/useAuth'
 import type { Zone } from '../types/database'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
@@ -9,7 +10,12 @@ import { Spinner } from '../components/ui/Spinner'
 export function CompetitionSettingsPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { isAdmin, loading: authLoading } = useAuth()
   const { competition, loading, updateCompetition } = useCompetition(id)
+
+  if (!authLoading && !isAdmin) {
+    return <Navigate to={id ? `/competitions/${id}` : '/'} replace />
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">

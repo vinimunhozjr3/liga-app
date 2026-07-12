@@ -12,7 +12,7 @@ export function MatchListItem({
   match: Match
   homeTeam: Team
   awayTeam: Team
-  onDelete: () => void
+  onDelete?: () => void
   selected?: boolean
   onToggleSelect?: () => void
 }) {
@@ -57,9 +57,11 @@ export function MatchListItem({
           <TeamCrest team={awayTeam} size={24} />
           <span className="truncate text-sm text-slate-900">{awayTeam.name}</span>
         </div>
-        <button onClick={onDelete} className="text-xs text-slate-400 hover:text-red-600" aria-label="Remover jogo">
-          ✕
-        </button>
+        {onDelete && (
+          <button onClick={onDelete} className="text-xs text-slate-400 hover:text-red-600" aria-label="Remover jogo">
+            ✕
+          </button>
+        )}
       </div>
       {penaltyWinner && (
         <p className="text-center text-xs text-amber-600">{penaltyWinner.name} venceu nos pênaltis</p>

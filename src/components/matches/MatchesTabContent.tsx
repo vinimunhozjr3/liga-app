@@ -15,12 +15,14 @@ export function MatchesTabContent({
   onDelete,
   onDeleteMany,
   onDeleteAll,
+  isAdmin = true,
 }: {
   matches: MatchRow[]
   teams: Team[]
   onDelete: (matchId: string) => void
   onDeleteMany: (matchIds: string[]) => void
   onDeleteAll: () => void
+  isAdmin?: boolean
 }) {
   const [teamFilter, setTeamFilter] = useState('')
   const [showPast, setShowPast] = useState(false)
@@ -66,18 +68,24 @@ export function MatchesTabContent({
   const topBar = (
     <div className="flex items-center justify-between gap-2">
       {teamFilterSelect}
-      <div className="flex shrink-0 items-center gap-2">
-        {selectedIds.size > 0 && (
-          <Button variant="danger" onClick={handleDeleteSelected}>
-            Excluir {selectedIds.size}
+      {isAdmin && (
+        <div className="flex shrink-0 items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button variant="danger" onClick={handleDeleteSelected}>
+              Excluir {selectedIds.size}
+            </Button>
+          )}
+          <Button variant="danger" onClick={handleDeleteAll}>
+            Excluir todos
           </Button>
-        )}
-        <Button variant="danger" onClick={handleDeleteAll}>
-          Excluir todos
-        </Button>
-      </div>
+        </div>
+      )}
     </div>
   )
+
+  const rowOnDelete = isAdmin ? onDelete : undefined
+  const rowOnToggleSelect = isAdmin ? toggleSelect : undefined
+  const rowSelectedIds = isAdmin ? selectedIds : undefined
 
   if (teamFilter) {
     const team = teams.find((t) => t.id === teamFilter)!
@@ -103,16 +111,16 @@ export function MatchesTabContent({
         {topBar}
         <TeamRecordSummary teamName={team.name} wins={record.wins} draws={record.draws} losses={record.losses} />
         {noRound.length > 0 && (
-          <MatchList matches={noRound} onDelete={onDelete} selectedIds={selectedIds} onToggleSelect={toggleSelect} />
+          <MatchList matches={noRound} onDelete={rowOnDelete} selectedIds={rowSelectedIds} onToggleSelect={rowOnToggleSelect} />
         )}
         {roundNumbers.map((r) => (
           <div key={r}>
             <p className="mb-1 px-1 text-sm font-bold uppercase tracking-wide text-slate-500">Rodada {r}</p>
             <MatchList
               matches={byRound.get(r)!}
-              onDelete={onDelete}
-              selectedIds={selectedIds}
-              onToggleSelect={toggleSelect}
+              onDelete={rowOnDelete}
+              selectedIds={rowSelectedIds}
+              onToggleSelect={rowOnToggleSelect}
             />
           </div>
         ))}
@@ -141,7 +149,7 @@ export function MatchesTabContent({
       {topBar}
 
       {noRound.length > 0 && (
-        <MatchList matches={noRound} onDelete={onDelete} selectedIds={selectedIds} onToggleSelect={toggleSelect} />
+        <MatchList matches={noRound} onDelete={rowOnDelete} selectedIds={rowSelectedIds} onToggleSelect={rowOnToggleSelect} />
       )}
 
       {currentRound != null && (
@@ -150,10 +158,10 @@ export function MatchesTabContent({
           <RoundGroup
             round={currentRound}
             matches={byRound.get(currentRound)!}
-            onDelete={onDelete}
+            onDelete={rowOnDelete}
             defaultExpanded
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
+            selectedIds={rowSelectedIds}
+            onToggleSelect={rowOnToggleSelect}
           />
         </div>
       )}
@@ -173,9 +181,9 @@ export function MatchesTabContent({
                   key={r}
                   round={r}
                   matches={byRound.get(r)!}
-                  onDelete={onDelete}
-                  selectedIds={selectedIds}
-                  onToggleSelect={toggleSelect}
+                  onDelete={rowOnDelete}
+                  selectedIds={rowSelectedIds}
+                  onToggleSelect={rowOnToggleSelect}
                 />
               ))}
             </div>

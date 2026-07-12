@@ -12,9 +12,11 @@ export interface ChampionRow {
 export function ChampionsRanking({
   rows,
   onChangeBaseCount,
+  isAdmin = true,
 }: {
   rows: ChampionRow[]
   onChangeBaseCount: (teamId: string, newCount: number) => Promise<void>
+  isAdmin?: boolean
 }) {
   const sorted = [...rows].sort((a, b) => {
     const totalA = a.baseTitlesCount + a.finalTitlesCount
@@ -36,7 +38,11 @@ export function ChampionsRanking({
             {row.runnerUpCount > 0 && <p className="text-xs text-slate-400">🥈 {row.runnerUpCount} vice(s)</p>}
           </div>
           <div className="flex items-center gap-1">
-            <TitleCounter count={row.baseTitlesCount} onChange={(n) => onChangeBaseCount(row.team.id, n)} />
+            {isAdmin ? (
+              <TitleCounter count={row.baseTitlesCount} onChange={(n) => onChangeBaseCount(row.team.id, n)} />
+            ) : (
+              <span className="text-sm font-semibold text-slate-900">{row.baseTitlesCount}</span>
+            )}
             {row.finalTitlesCount > 0 && (
               <span className="text-xs text-slate-400" title="Títulos vindos de finais registradas">
                 +{row.finalTitlesCount}

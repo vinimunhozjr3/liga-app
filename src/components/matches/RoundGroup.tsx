@@ -12,7 +12,7 @@ export function RoundGroup({
 }: {
   round: number
   matches: MatchRow[]
-  onDelete: (matchId: string) => void
+  onDelete?: (matchId: string) => void
   defaultExpanded?: boolean
   selectedIds?: Set<string>
   onToggleSelect?: (matchId: string) => void

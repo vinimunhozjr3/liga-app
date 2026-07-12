@@ -13,10 +13,12 @@ export function RoundNewsPanel({
   competitionId,
   rounds,
   allTeams,
+  isAdmin = true,
 }: {
   competitionId: string
   rounds: number[]
   allTeams: Team[]
+  isAdmin?: boolean
 }) {
   const [round, setRound] = useState<number | null>(rounds[0] ?? null)
   const [rivalriesOpen, setRivalriesOpen] = useState(false)
@@ -40,9 +42,11 @@ export function RoundNewsPanel({
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">Notícia da rodada, escrita por IA no maior climão de zoeira.</p>
-        <button onClick={() => setRivalriesOpen(true)} className="text-xs text-slate-500 hover:underline">
-          Gerenciar rivalidades
-        </button>
+        {isAdmin && (
+          <button onClick={() => setRivalriesOpen(true)} className="text-xs text-slate-500 hover:underline">
+            Gerenciar rivalidades
+          </button>
+        )}
       </div>
 
       <Select value={round ?? ''} onChange={(e) => setRound(Number(e.target.value))}>
@@ -60,14 +64,19 @@ export function RoundNewsPanel({
       ) : (
         <>
           {news && <NewsArticle news={news} />}
+          {!news && !isAdmin && <EmptyState title="Nenhuma notícia gerada ainda pra essa rodada" />}
           {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button onClick={handleGenerate} disabled={generating} variant={news ? 'secondary' : 'primary'}>
-            {generating ? 'Gerando...' : news ? 'Gerar de novo' : 'Gerar notícia'}
-          </Button>
+          {isAdmin && (
+            <Button onClick={handleGenerate} disabled={generating} variant={news ? 'secondary' : 'primary'}>
+              {generating ? 'Gerando...' : news ? 'Gerar de novo' : 'Gerar notícia'}
+            </Button>
+          )}
         </>
       )}
 
-      <ManageRivalriesModal open={rivalriesOpen} onClose={() => setRivalriesOpen(false)} teams={allTeams} />
+      {isAdmin && (
+        <ManageRivalriesModal open={rivalriesOpen} onClose={() => setRivalriesOpen(false)} teams={allTeams} />
+      )}
     </div>
   )
 }
