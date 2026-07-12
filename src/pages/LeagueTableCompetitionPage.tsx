@@ -128,20 +128,22 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
       {tab === 'matches' && (
         <div className="flex flex-col gap-3">
-          {isAdmin && (
-            <div className="flex flex-wrap justify-end gap-2">
-              <Button variant="secondary" onClick={() => setCalendarModalOpen(true)}>
-                Importar calendário
-              </Button>
-              <Button variant="secondary" onClick={() => setResultsBlockModalOpen(true)}>
-                Colar resultados da rodada
-              </Button>
-              <Button variant="secondary" onClick={() => setImportModalOpen(true)}>
-                Importar de print
-              </Button>
-              <Button onClick={() => setMatchModalOpen(true)}>+ Lançar placar</Button>
-            </div>
-          )}
+          <div className="flex flex-wrap justify-end gap-2">
+            {isAdmin && (
+              <>
+                <Button variant="secondary" onClick={() => setCalendarModalOpen(true)}>
+                  Importar calendário
+                </Button>
+                <Button variant="secondary" onClick={() => setResultsBlockModalOpen(true)}>
+                  Colar resultados da rodada
+                </Button>
+                <Button variant="secondary" onClick={() => setImportModalOpen(true)}>
+                  Importar de print
+                </Button>
+              </>
+            )}
+            <Button onClick={() => setMatchModalOpen(true)}>+ Lançar placar</Button>
+          </div>
           {matchesLoading ? (
             <div className="flex flex-1 items-center justify-center">
               <Spinner />
@@ -211,15 +213,15 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
         <RoundNewsPanel competitionId={competition.id} rounds={playedRounds} allTeams={allTeams} isAdmin={isAdmin} />
       )}
 
+      <MatchFormModal
+        open={matchModalOpen}
+        onClose={() => setMatchModalOpen(false)}
+        teams={teams}
+        onSubmit={handleRecordMatch}
+      />
+
       {isAdmin && (
         <>
-          <MatchFormModal
-            open={matchModalOpen}
-            onClose={() => setMatchModalOpen(false)}
-            teams={teams}
-            onSubmit={handleRecordMatch}
-          />
-
           <ImportFromScreenshotModal
             open={importModalOpen}
             onClose={() => setImportModalOpen(false)}

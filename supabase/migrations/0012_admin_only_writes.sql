@@ -28,10 +28,12 @@ create policy "admin can insert competition_teams" on public.competition_teams f
 create policy "admin can delete competition_teams" on public.competition_teams for delete to authenticated using (public.is_admin());
 
 -- matches
-drop policy "authenticated can insert matches" on public.matches;
+-- insert continua liberado pra qualquer autenticado (lancamento manual de
+-- placar, um jogo por vez, pelo formulario "+ Lancar placar"); update e
+-- delete (usados por calendario/resultados em bloco/bulk-delete) ficam
+-- restritos a admin.
 drop policy "authenticated can update matches" on public.matches;
 drop policy "authenticated can delete matches" on public.matches;
-create policy "admin can insert matches" on public.matches for insert to authenticated with check (public.is_admin());
 create policy "admin can update matches" on public.matches for update to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "admin can delete matches" on public.matches for delete to authenticated using (public.is_admin());
 
