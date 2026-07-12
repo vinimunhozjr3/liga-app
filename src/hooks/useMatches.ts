@@ -71,6 +71,13 @@ export function useMatches(competitionId: string | undefined) {
     await refresh()
   }
 
+  async function deleteMatches(matchIds: string[]) {
+    if (matchIds.length === 0) return
+    const { error } = await supabase.from('matches').delete().in('id', matchIds)
+    if (error) throw error
+    await refresh()
+  }
+
   async function scheduleMatches(
     entries: { home_team_id: string; away_team_id: string; round: number }[]
   ) {
@@ -135,5 +142,16 @@ export function useMatches(competitionId: string | undefined) {
     await refresh()
   }
 
-  return { matches, loading, error, refresh, recordMatch, updateMatch, deleteMatch, scheduleMatches, applyResults }
+  return {
+    matches,
+    loading,
+    error,
+    refresh,
+    recordMatch,
+    updateMatch,
+    deleteMatch,
+    deleteMatches,
+    scheduleMatches,
+    applyResults,
+  }
 }

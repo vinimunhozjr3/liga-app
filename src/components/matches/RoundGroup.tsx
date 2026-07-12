@@ -7,11 +7,15 @@ export function RoundGroup({
   matches,
   onDelete,
   defaultExpanded = false,
+  selectedIds,
+  onToggleSelect,
 }: {
   round: number
   matches: MatchRow[]
   onDelete: (matchId: string) => void
   defaultExpanded?: boolean
+  selectedIds?: Set<string>
+  onToggleSelect?: (matchId: string) => void
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
   const playedCount = matches.filter((m) => m.status === 'played').length
@@ -28,7 +32,9 @@ export function RoundGroup({
           <span>{expanded ? '▲' : '▼'}</span>
         </span>
       </button>
-      {expanded && <MatchList matches={matches} onDelete={onDelete} />}
+      {expanded && (
+        <MatchList matches={matches} onDelete={onDelete} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
+      )}
     </div>
   )
 }

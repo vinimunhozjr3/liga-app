@@ -38,6 +38,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
     loading: matchesLoading,
     recordMatch,
     deleteMatch,
+    deleteMatches,
     scheduleMatches,
     applyResults,
     refresh: refreshMatches,
@@ -65,6 +66,16 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
   async function handleDeleteMatch(matchId: string) {
     await deleteMatch(matchId)
+    await refreshStandings()
+  }
+
+  async function handleDeleteManyMatches(matchIds: string[]) {
+    await deleteMatches(matchIds)
+    await refreshStandings()
+  }
+
+  async function handleDeleteAllMatches() {
+    await deleteMatches(matches.map((m) => m.id))
     await refreshStandings()
   }
 
@@ -130,7 +141,13 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
               <Spinner />
             </div>
           ) : (
-            <MatchesTabContent matches={matches} teams={teams} onDelete={handleDeleteMatch} />
+            <MatchesTabContent
+              matches={matches}
+              teams={teams}
+              onDelete={handleDeleteMatch}
+              onDeleteMany={handleDeleteManyMatches}
+              onDeleteAll={handleDeleteAllMatches}
+            />
           )}
         </div>
       )}

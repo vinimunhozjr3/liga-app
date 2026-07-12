@@ -10,9 +10,13 @@ interface MatchWithTeams extends Match {
 export function MatchList({
   matches,
   onDelete,
+  selectedIds,
+  onToggleSelect,
 }: {
   matches: MatchWithTeams[]
   onDelete: (matchId: string) => void
+  selectedIds?: Set<string>
+  onToggleSelect?: (matchId: string) => void
 }) {
   if (matches.length === 0) {
     return <EmptyState title="Nenhum jogo lançado" description="Lance o primeiro placar da competição." />
@@ -27,6 +31,8 @@ export function MatchList({
           homeTeam={match.home_team}
           awayTeam={match.away_team}
           onDelete={() => onDelete(match.id)}
+          selected={selectedIds?.has(match.id)}
+          onToggleSelect={onToggleSelect ? () => onToggleSelect(match.id) : undefined}
         />
       ))}
     </ul>
