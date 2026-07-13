@@ -16,7 +16,7 @@ export function HomePage() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-900">Campeonatos</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900">Campeonatos</h1>
         {isAdmin && <Button onClick={() => setModalOpen(true)}>+ Novo</Button>}
       </div>
 
