@@ -8,6 +8,7 @@ export function MatchListItem({
   onDelete,
   selected = false,
   onToggleSelect,
+  onEditScore,
 }: {
   match: Match
   homeTeam: Team
@@ -15,6 +16,7 @@ export function MatchListItem({
   onDelete?: () => void
   selected?: boolean
   onToggleSelect?: () => void
+  onEditScore?: () => void
 }) {
   const penaltyWinner =
     match.penalty_winner_team_id === homeTeam.id
@@ -42,10 +44,21 @@ export function MatchListItem({
           <TeamCrest team={homeTeam} size={24} />
         </div>
         {isScheduled ? (
-          <div className="flex flex-col items-center rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-500">
-            <span>Agendado</span>
-            {match.round != null && <span className="text-[10px] text-slate-400">Rodada {match.round}</span>}
-          </div>
+          onEditScore ? (
+            <button
+              type="button"
+              onClick={onEditScore}
+              className="flex flex-col items-center rounded-md bg-amber-50 px-2 py-1 text-xs text-amber-700 hover:bg-amber-100"
+            >
+              <span className="font-medium">Lançar placar</span>
+              {match.round != null && <span className="text-[10px] text-amber-500">Rodada {match.round}</span>}
+            </button>
+          ) : (
+            <div className="flex flex-col items-center rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-500">
+              <span>Agendado</span>
+              {match.round != null && <span className="text-[10px] text-slate-400">Rodada {match.round}</span>}
+            </div>
+          )
         ) : (
           <div className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-sm font-semibold text-slate-900">
             <span>{match.home_score}</span>

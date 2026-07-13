@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth'
 import { StandingsTable } from '../components/standings/StandingsTable'
 import { MatchesTabContent } from '../components/matches/MatchesTabContent'
 import { MatchFormModal } from '../components/matches/MatchFormModal'
+import { EditMatchScoreModal } from '../components/matches/EditMatchScoreModal'
 import { ImportFromScreenshotModal } from '../components/matches/ImportFromScreenshotModal'
 import { ImportCalendarModal } from '../components/matches/ImportCalendarModal'
 import { ImportResultsBlockModal } from '../components/matches/ImportResultsBlockModal'
@@ -39,6 +40,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
     matches,
     loading: matchesLoading,
     recordMatch,
+    updateMatch,
     deleteMatch,
     deleteMatches,
     scheduleMatches,
@@ -54,6 +56,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
   const [resultsBlockModalOpen, setResultsBlockModalOpen] = useState(false)
   const [addTeamModalOpen, setAddTeamModalOpen] = useState(false)
   const [editingTeam, setEditingTeam] = useState<Team | null>(null)
+  const [editingMatchId, setEditingMatchId] = useState<string | null>(null)
 
   const existingTeamIds = new Set(competitionTeamRows.map((r) => r.team_id))
   const rounds = [...new Set(matches.map((m) => m.round).filter((r): r is number => r != null))].sort((a, b) => a - b)
@@ -80,6 +83,14 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
     await deleteMatches(matches.map((m) => m.id))
     await refreshStandings()
   }
+
+  async function handleSubmitScoreEdit(input: Parameters<typeof updateMatch>[1]) {
+    if (!editingMatchId) return
+    await updateMatch(editingMatchId, { ...input, status: 'played' })
+    await refreshStandings()
+  }
+
+  const editingMatch = matches.find((m) => m.id === editingMatchId) ?? null
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
@@ -155,6 +166,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
               onDelete={handleDeleteMatch}
               onDeleteMany={handleDeleteManyMatches}
               onDeleteAll={handleDeleteAllMatches}
+              onEditScore={setEditingMatchId}
               isAdmin={isAdmin}
             />
           )}
@@ -222,6 +234,13 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
       {isAdmin && (
         <>
+          <EditMatchScoreModal
+            open={!!editingMatchId}
+            onClose={() => setEditingMatchId(null)}
+            match={editingMatch}
+            onSubmit={handleSubmitScoreEdit}
+          />
+
           <ImportFromScreenshotModal
             open={importModalOpen}
             onClose={() => setImportModalOpen(false)}

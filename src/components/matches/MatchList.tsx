@@ -12,11 +12,13 @@ export function MatchList({
   onDelete,
   selectedIds,
   onToggleSelect,
+  onEditScore,
 }: {
   matches: MatchWithTeams[]
   onDelete?: (matchId: string) => void
   selectedIds?: Set<string>
   onToggleSelect?: (matchId: string) => void
+  onEditScore?: (matchId: string) => void
 }) {
   if (matches.length === 0) {
     return <EmptyState title="Nenhum jogo lançado" description="Lance o primeiro placar da competição." />
@@ -33,6 +35,7 @@ export function MatchList({
           onDelete={onDelete ? () => onDelete(match.id) : undefined}
           selected={selectedIds?.has(match.id)}
           onToggleSelect={onToggleSelect ? () => onToggleSelect(match.id) : undefined}
+          onEditScore={onEditScore ? () => onEditScore(match.id) : undefined}
         />
       ))}
     </ul>

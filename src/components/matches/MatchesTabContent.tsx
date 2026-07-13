@@ -9,12 +9,21 @@ import { Select } from '../ui/Select'
 import { Button } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
 
+// Cada turno do returno-turno tem 7 rodadas (grupo de 7 times, todos contra
+// todos uma vez por turno). Usado só pra agrupar visualmente, nao muda dados.
+const ROUNDS_PER_TURNO = 7
+
+function turnoOf(round: number) {
+  return Math.ceil(round / ROUNDS_PER_TURNO)
+}
+
 export function MatchesTabContent({
   matches,
   teams,
   onDelete,
   onDeleteMany,
   onDeleteAll,
+  onEditScore,
   isAdmin = true,
 }: {
   matches: MatchRow[]
@@ -22,6 +31,7 @@ export function MatchesTabContent({
   onDelete: (matchId: string) => void
   onDeleteMany: (matchIds: string[]) => void
   onDeleteAll: () => void
+  onEditScore: (matchId: string) => void
   isAdmin?: boolean
 }) {
   const [teamFilter, setTeamFilter] = useState('')
@@ -86,6 +96,7 @@ export function MatchesTabContent({
   const rowOnDelete = isAdmin ? onDelete : undefined
   const rowOnToggleSelect = isAdmin ? toggleSelect : undefined
   const rowSelectedIds = isAdmin ? selectedIds : undefined
+  const rowOnEditScore = isAdmin ? onEditScore : undefined
 
   if (teamFilter) {
     const team = teams.find((t) => t.id === teamFilter)!
@@ -111,7 +122,13 @@ export function MatchesTabContent({
         {topBar}
         <TeamRecordSummary teamName={team.name} wins={record.wins} draws={record.draws} losses={record.losses} />
         {noRound.length > 0 && (
-          <MatchList matches={noRound} onDelete={rowOnDelete} selectedIds={rowSelectedIds} onToggleSelect={rowOnToggleSelect} />
+          <MatchList
+            matches={noRound}
+            onDelete={rowOnDelete}
+            selectedIds={rowSelectedIds}
+            onToggleSelect={rowOnToggleSelect}
+            onEditScore={rowOnEditScore}
+          />
         )}
         {roundNumbers.map((r) => (
           <div key={r}>
@@ -121,6 +138,7 @@ export function MatchesTabContent({
               onDelete={rowOnDelete}
               selectedIds={rowSelectedIds}
               onToggleSelect={rowOnToggleSelect}
+              onEditScore={rowOnEditScore}
             />
           </div>
         ))}
@@ -144,17 +162,33 @@ export function MatchesTabContent({
   const currentRound = roundsWithScheduled.length > 0 ? roundsWithScheduled[0] : roundNumbers[roundNumbers.length - 1]
   const otherRounds = roundNumbers.filter((r) => r !== currentRound).sort((a, b) => b - a)
 
+  const otherRoundsByTurno = new Map<number, number[]>()
+  for (const r of otherRounds) {
+    const t = turnoOf(r)
+    if (!otherRoundsByTurno.has(t)) otherRoundsByTurno.set(t, [])
+    otherRoundsByTurno.get(t)!.push(r)
+  }
+  const turnoNumbers = [...otherRoundsByTurno.keys()].sort((a, b) => b - a)
+
   return (
     <div className="flex flex-col gap-3">
       {topBar}
 
       {noRound.length > 0 && (
-        <MatchList matches={noRound} onDelete={rowOnDelete} selectedIds={rowSelectedIds} onToggleSelect={rowOnToggleSelect} />
+        <MatchList
+          matches={noRound}
+          onDelete={rowOnDelete}
+          selectedIds={rowSelectedIds}
+          onToggleSelect={rowOnToggleSelect}
+          onEditScore={rowOnEditScore}
+        />
       )}
 
       {currentRound != null && (
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">Rodada atual</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Rodada atual · Turno {turnoOf(currentRound)}
+          </p>
           <RoundGroup
             round={currentRound}
             matches={byRound.get(currentRound)!}
@@ -162,6 +196,7 @@ export function MatchesTabContent({
             defaultExpanded
             selectedIds={rowSelectedIds}
             onToggleSelect={rowOnToggleSelect}
+            onEditScore={rowOnEditScore}
           />
         </div>
       )}
@@ -175,16 +210,22 @@ export function MatchesTabContent({
             {showPast ? 'Esconder outras rodadas' : `Ver outras rodadas (${otherRounds.length})`}
           </button>
           {showPast && (
-            <div className="flex flex-col gap-2">
-              {otherRounds.map((r) => (
-                <RoundGroup
-                  key={r}
-                  round={r}
-                  matches={byRound.get(r)!}
-                  onDelete={rowOnDelete}
-                  selectedIds={rowSelectedIds}
-                  onToggleSelect={rowOnToggleSelect}
-                />
+            <div className="flex flex-col gap-4">
+              {turnoNumbers.map((turno) => (
+                <div key={turno} className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Turno {turno}</p>
+                  {otherRoundsByTurno.get(turno)!.map((r) => (
+                    <RoundGroup
+                      key={r}
+                      round={r}
+                      matches={byRound.get(r)!}
+                      onDelete={rowOnDelete}
+                      selectedIds={rowSelectedIds}
+                      onToggleSelect={rowOnToggleSelect}
+                      onEditScore={rowOnEditScore}
+                    />
+                  ))}
+                </div>
               ))}
             </div>
           )}
