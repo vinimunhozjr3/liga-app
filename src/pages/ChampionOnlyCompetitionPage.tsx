@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import type { Competition } from '../types/database'
 import { useCompetitionTeams } from '../hooks/useCompetitionTeams'
 import { useTeamTitles } from '../hooks/useTeamTitles'
@@ -7,6 +6,7 @@ import { useTeams } from '../hooks/useTeams'
 import { useFinals } from '../hooks/useFinals'
 import { useChampionStats } from '../hooks/useChampionStats'
 import { useAuth } from '../hooks/useAuth'
+import { CompetitionHeader } from '../components/competitions/CompetitionHeader'
 import { ChampionsRanking } from '../components/champions/ChampionsRanking'
 import { RecordFinalModal } from '../components/champions/RecordFinalModal'
 import { FinalsHistoryList } from '../components/champions/FinalsHistoryList'
@@ -41,17 +41,7 @@ export function ChampionOnlyCompetitionPage({ competition }: { competition: Comp
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">{competition.name}</h1>
-          {competition.season && <p className="text-xs text-slate-500">{competition.season}</p>}
-        </div>
-        {isAdmin && (
-          <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
-            Configurações
-          </Link>
-        )}
-      </div>
+      <CompetitionHeader competition={competition} isAdmin={isAdmin} />
 
       <div>
         <div className="mb-2 flex items-center justify-between">

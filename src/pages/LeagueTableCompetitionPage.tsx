@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import type { Competition } from '../types/database'
 import { useCompetitionTeams } from '../hooks/useCompetitionTeams'
 import { useMatches } from '../hooks/useMatches'
@@ -7,6 +6,7 @@ import { useStandings } from '../hooks/useStandings'
 import { useTeams } from '../hooks/useTeams'
 import { usePlayerStats } from '../hooks/usePlayerStats'
 import { useAuth } from '../hooks/useAuth'
+import { CompetitionHeader } from '../components/competitions/CompetitionHeader'
 import { StandingsTable } from '../components/standings/StandingsTable'
 import { MatchesTabContent } from '../components/matches/MatchesTabContent'
 import { MatchFormModal } from '../components/matches/MatchFormModal'
@@ -94,17 +94,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">{competition.name}</h1>
-          {competition.season && <p className="text-xs text-slate-500">{competition.season}</p>}
-        </div>
-        {isAdmin && (
-          <Link to={`/competitions/${competition.id}/settings`} className="text-sm text-slate-500 hover:underline">
-            Configurações
-          </Link>
-        )}
-      </div>
+      <CompetitionHeader competition={competition} isAdmin={isAdmin} />
 
       <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
         {(
@@ -120,7 +110,7 @@ export function LeagueTableCompetitionPage({ competition }: { competition: Compe
             key={key}
             onClick={() => setTab(key)}
             className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-colors ${
-              tab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              tab === key ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             {label}
