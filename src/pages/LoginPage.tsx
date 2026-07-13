@@ -23,9 +23,6 @@ export function LoginPage() {
       <img src="/login-hero.png" alt="Amigos do 7 a 0" className="-mb-1 mt-2 w-full max-w-xs" />
 
       <div className="w-full max-w-sm">
-        <p className="mb-4 text-center text-sm text-slate-500">
-          Entre com seu e-mail para ver e editar os campeonatos do grupo.
-        </p>
         <LoginForm />
       </div>
     </div>
