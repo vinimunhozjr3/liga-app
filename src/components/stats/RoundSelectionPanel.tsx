@@ -19,7 +19,7 @@ function PlayerChip({ entry, label }: { entry: SelectionEntry; label: string }) 
 }
 
 export function RoundSelectionPanel({ competitionId, rounds }: { competitionId: string; rounds: number[] }) {
-  const [round, setRound] = useState<number | null>(rounds[0] ?? null)
+  const [round, setRound] = useState<number | null>(rounds[rounds.length - 1] ?? null)
   const { selection, loading, error } = useRoundSelection(competitionId, round)
 
   if (rounds.length === 0) {
@@ -33,7 +33,7 @@ export function RoundSelectionPanel({ competitionId, rounds }: { competitionId: 
         escolha a rodada abaixo, não precisa selecionar os jogadores.
       </p>
       <Select value={round ?? ''} onChange={(e) => setRound(Number(e.target.value))}>
-        {rounds.map((r) => (
+        {[...rounds].reverse().map((r) => (
           <option key={r} value={r}>
             Rodada {r}
           </option>

@@ -20,7 +20,7 @@ export function RoundNewsPanel({
   allTeams: Team[]
   isAdmin?: boolean
 }) {
-  const [round, setRound] = useState<number | null>(rounds[0] ?? null)
+  const [round, setRound] = useState<number | null>(rounds[rounds.length - 1] ?? null)
   const [rivalriesOpen, setRivalriesOpen] = useState(false)
   const [error, setError] = useState('')
   const { news, loading, generating, generate } = useRoundNews(competitionId, round)
@@ -50,7 +50,7 @@ export function RoundNewsPanel({
       </div>
 
       <Select value={round ?? ''} onChange={(e) => setRound(Number(e.target.value))}>
-        {rounds.map((r) => (
+        {[...rounds].reverse().map((r) => (
           <option key={r} value={r}>
             Rodada {r}
           </option>
