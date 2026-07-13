@@ -9,6 +9,27 @@ export interface ChampionRow {
   runnerUpCount: number
 }
 
+const RANK_BADGE = [
+  'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950 ring-2 ring-amber-200', // ouro
+  'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 ring-2 ring-slate-200', // prata
+  'bg-gradient-to-br from-orange-400 to-orange-600 text-white ring-2 ring-orange-200', // bronze
+]
+
+const RANK_BORDER = ['border-l-amber-400', 'border-l-slate-400', 'border-l-orange-500']
+
+function RankBadge({ position }: { position: number }) {
+  const style = RANK_BADGE[position - 1]
+  return (
+    <span
+      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+        style ?? 'bg-slate-100 text-slate-500'
+      }`}
+    >
+      {position}
+    </span>
+  )
+}
+
 export function ChampionsRanking({
   rows,
   onChangeBaseCount,
@@ -25,10 +46,13 @@ export function ChampionsRanking({
   })
 
   return (
-    <ol className="divide-y divide-slate-100 rounded-xl border border-slate-200">
+    <ol className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200">
       {sorted.map((row, index) => (
-        <li key={row.team.id} className="flex items-center gap-3 px-4 py-3">
-          <span className="w-5 text-right text-sm font-semibold text-slate-400">{index + 1}</span>
+        <li
+          key={row.team.id}
+          className={`flex items-center gap-3 border-l-4 px-4 py-3 ${RANK_BORDER[index] ?? 'border-l-transparent'}`}
+        >
+          <RankBadge position={index + 1} />
           <TeamCrest team={row.team} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-slate-900">{row.team.name}</p>

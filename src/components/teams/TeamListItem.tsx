@@ -15,7 +15,7 @@ export function TeamListItem({
 }) {
   return (
     <li className="flex items-center gap-3 px-4 py-3">
-      <TeamCrest team={team} />
+      <TeamCrest team={team} size={36} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-slate-900">{team.name}</p>
         {team.coach_name && <p className="truncate text-xs text-slate-500">Téc. {team.coach_name}</p>}

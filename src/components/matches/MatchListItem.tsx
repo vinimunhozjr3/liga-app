@@ -41,33 +41,33 @@ export function MatchListItem({
         )}
         <div className="flex flex-1 items-center justify-end gap-2">
           <span className="truncate text-sm text-slate-900">{homeTeam.name}</span>
-          <TeamCrest team={homeTeam} size={24} />
+          <TeamCrest team={homeTeam} size={28} />
         </div>
         {isScheduled ? (
           onEditScore ? (
             <button
               type="button"
               onClick={onEditScore}
-              className="flex flex-col items-center rounded-md bg-amber-50 px-2 py-1 text-xs text-amber-700 hover:bg-amber-100"
+              className="flex flex-col items-center rounded-full bg-amber-100 px-3 py-1.5 text-xs text-amber-800 hover:bg-amber-200"
             >
-              <span className="font-medium">Lançar placar</span>
-              {match.round != null && <span className="text-[10px] text-amber-500">Rodada {match.round}</span>}
+              <span className="font-semibold">Lançar placar</span>
+              {match.round != null && <span className="text-[10px] text-amber-600">Rodada {match.round}</span>}
             </button>
           ) : (
-            <div className="flex flex-col items-center rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-500">
+            <div className="flex flex-col items-center rounded-full bg-slate-100 px-3 py-1.5 text-xs text-slate-500">
               <span>Agendado</span>
               {match.round != null && <span className="text-[10px] text-slate-400">Rodada {match.round}</span>}
             </div>
           )
         ) : (
-          <div className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-sm font-semibold text-slate-900">
+          <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-bold text-emerald-900">
             <span>{match.home_score}</span>
-            <span className="text-slate-400">x</span>
+            <span className="text-emerald-400">x</span>
             <span>{match.away_score}</span>
           </div>
         )}
         <div className="flex flex-1 items-center gap-2">
-          <TeamCrest team={awayTeam} size={24} />
+          <TeamCrest team={awayTeam} size={28} />
           <span className="truncate text-sm text-slate-900">{awayTeam.name}</span>
         </div>
         {onDelete && (

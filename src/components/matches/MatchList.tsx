@@ -25,7 +25,7 @@ export function MatchList({
   }
 
   return (
-    <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200">
+    <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
       {matches.map((match) => (
         <MatchListItem
           key={match.id}
