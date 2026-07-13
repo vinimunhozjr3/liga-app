@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { Competition } from '../types/database'
 import { useCompetitionTeams } from '../hooks/useCompetitionTeams'
 import { useMatches } from '../hooks/useMatches'
@@ -28,9 +29,13 @@ import type { Team } from '../types/database'
 
 type Tab = 'standings' | 'matches' | 'teams' | 'stats' | 'news'
 
+const VALID_TABS: Tab[] = ['standings', 'matches', 'teams', 'stats', 'news']
+
 export function LeagueTableCompetitionPage({ competition }: { competition: Competition }) {
   const { isAdmin } = useAuth()
-  const [tab, setTab] = useState<Tab>('standings')
+  const [searchParams] = useSearchParams()
+  const initialTab = VALID_TABS.find((t) => t === searchParams.get('tab')) ?? 'standings'
+  const [tab, setTab] = useState<Tab>(initialTab)
 
   const { standings, loading: standingsLoading, refresh: refreshStandings } = useStandings(competition.id)
   const { rows: competitionTeamRows, teams, loading: teamsLoading, addTeam, removeTeam } = useCompetitionTeams(

@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth'
 import { DEFAULT_ZONES } from '../lib/constants'
 import { CompetitionCard } from '../components/competitions/CompetitionCard'
 import { CreateCompetitionModal } from '../components/competitions/CreateCompetitionModal'
+import { NextMatchCard } from '../components/home/NextMatchCard'
+import { LatestNewsCard } from '../components/home/LatestNewsCard'
 import { Button } from '../components/ui/Button'
 import { Spinner } from '../components/ui/Spinner'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -35,6 +37,21 @@ export function HomePage() {
           {competitions.map((c) => (
             <CompetitionCard key={c.id} competition={c} />
           ))}
+        </div>
+      )}
+
+      {!loading && competitions.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {competitions
+            .filter((c) => c.type === 'league_table')
+            .map((c) => (
+              <NextMatchCard key={c.id} competition={c} />
+            ))}
+          {competitions
+            .filter((c) => c.type === 'league_table')
+            .map((c) => (
+              <LatestNewsCard key={c.id} competition={c} />
+            ))}
         </div>
       )}
 
